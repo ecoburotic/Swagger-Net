@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Web.Http.Controllers;
 
 namespace Swagger.Net.Dummy.SwaggerExtensions
 {
     public class ApplySchemaVendorExtensions : ISchemaFilter
     {
-        public void Apply(Schema schema, SchemaRegistry schemaRegistry, Type type)
+        public void Apply(Schema schema, SchemaRegistry schemaRegistry, Type type, HttpParameterDescriptor parameterDescriptor = null)
         {
             if (type.IsArray && type.GetElementType() != typeof(byte)) return; // Special case
 

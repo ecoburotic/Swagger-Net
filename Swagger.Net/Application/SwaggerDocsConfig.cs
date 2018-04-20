@@ -67,6 +67,7 @@ namespace Swagger.Net.Application
             _rootUrlResolver = DefaultRootUrlResolver;
 
             SchemaFilter<ApplySwaggerSchemaFilterAttributes>();
+            SchemaFilter<ApplySwaggerSchemaExample>();
 
             //TODO: Can we improve performance by consolidating the OperationFilters?
             OperationFilter<HandleFromUriParams>();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.Http.Controllers;
 
 namespace Swagger.Net.Annotations
 {
@@ -15,7 +16,7 @@ namespace Swagger.Net.Annotations
                 return attributes;
         }
 
-        public void Apply(Schema schema, SchemaRegistry schemaRegistry, Type type)
+        public void Apply(Schema schema, SchemaRegistry schemaRegistry, Type type, HttpParameterDescriptor parameterDescriptor = null)
         {
             foreach (var attribute in Attributes(type))
             {

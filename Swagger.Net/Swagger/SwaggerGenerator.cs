@@ -265,7 +265,7 @@ namespace Swagger.Net
                 if (parameter.description == null)
                     parameter.description = paramDesc.GetDescriptionAttribute()?.Description;
 
-                var schema = schemaRegistry.GetOrRegister(paramDesc.ParameterDescriptor.ParameterType);
+                var schema = schemaRegistry.GetOrRegister(paramDesc.ParameterDescriptor.ParameterType, parameterDescriptor: paramDesc.ParameterDescriptor);
                 if (parameter.@in == "body")
                     parameter.schema = schema;
                 else

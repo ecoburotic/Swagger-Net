@@ -68,6 +68,7 @@
     <Compile Include="Application\HttpRouteDirectionConstraint.cs" />
     <Compile Include="Swagger\Annotations\ApplySwaggerHeaderParamAttribute.cs" />
     <Compile Include="Swagger\Annotations\ApplySwaggerOperationAttributes.cs" />
+    <Compile Include="Swagger\Annotations\ApplySwaggerSchemaExample.cs" />
     <Compile Include="Swagger\Annotations\ApplySwaggerSchemaFilterAttributes.cs" />
     <Compile Include="Swagger\Annotations\ApplySwaggerOperationFilterAttributes.cs" />
     <Compile Include="Swagger\Annotations\ApplySwaggerOperationApiKey.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Swagger\Annotations\SwaggerHeaderParamAttribute.cs" />
     <Compile Include="Swagger\Annotations\SwaggerOperationAttribute.cs" />
     <Compile Include="Swagger\Annotations\SwaggerPaginationHeaderParametersAttribute.cs" />
+    <Compile Include="Swagger\Annotations\SwaggerSchemaExampleAttribute.cs" />
     <Compile Include="Swagger\Annotations\SwaggerSchemaFilterAttribute.cs" />
     <Compile Include="Swagger\Annotations\SwaggerOperationFilterAttribute.cs" />
     <Compile Include="Swagger\Annotations\SwaggerResponseRemoveDefaultsAttribute.cs" />

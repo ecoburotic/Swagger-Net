@@ -4,6 +4,7 @@ using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.Http.Controllers;
 
 namespace Swagger.Net
 {
@@ -34,9 +35,9 @@ namespace Swagger.Net
             Definitions = new Dictionary<string, Schema>();
         }
 
-        public Schema GetOrRegister(Type type, string typeName = null)
+        public Schema GetOrRegister(Type type, string typeName = null, HttpParameterDescriptor parameterDescriptor = null)
         {
-            var schema = CreateInlineSchema(type, typeName);
+            var schema = CreateInlineSchema(type, typeName, parameterDescriptor);
 
             // Iterate outstanding work items (i.e. referenced types) and generate the corresponding definition
             while (_workItems.Any(entry => entry.Value.Schema == null && !entry.Value.InProgress))
@@ -45,7 +46,7 @@ namespace Swagger.Net
                 var workItem = typeMapping.Value;
 
                 workItem.InProgress = true;
-                workItem.Schema = CreateDefinitionSchema(typeMapping.Key);
+                workItem.Schema = CreateDefinitionSchema(typeMapping.Key, parameterDescriptor);
                 Definitions.Add(workItem.SchemaId, workItem.Schema);
                 workItem.InProgress = false;
             }
@@ -55,53 +56,53 @@ namespace Swagger.Net
 
         public IDictionary<string, Schema> Definitions { get; private set; }
 
-        public Schema CreateInlineSchema(Type type, string typeName = null)
+        public Schema CreateInlineSchema(Type type, string typeName = null, HttpParameterDescriptor parameterDescriptor = null)
         {
             var jsonContract = _contractResolver.ResolveContract(type);
 
             if (_options.CustomSchemaMappings.ContainsKey(type))
-                return FilterSchema(_options.CustomSchemaMappings[type](), jsonContract);
+                return FilterSchema(_options.CustomSchemaMappings[type](), jsonContract, parameterDescriptor);
 
             if (jsonContract is JsonPrimitiveContract)
-                return FilterSchema(CreatePrimitiveSchema((JsonPrimitiveContract)jsonContract), jsonContract);
+                return FilterSchema(CreatePrimitiveSchema((JsonPrimitiveContract)jsonContract), jsonContract, parameterDescriptor);
 
             var dictionaryContract = jsonContract as JsonDictionaryContract;
             if (dictionaryContract != null)
                 return dictionaryContract.IsSelfReferencing()
                     ? CreateRefSchema(type)
-                    : FilterSchema(CreateDictionarySchema(dictionaryContract), jsonContract);
+                    : FilterSchema(CreateDictionarySchema(dictionaryContract), jsonContract, parameterDescriptor);
 
             var arrayContract = jsonContract as JsonArrayContract;
             if (arrayContract != null)
                 return arrayContract.IsSelfReferencing()
                     ? CreateRefSchema(type)
-                    : FilterSchema(CreateArraySchema(arrayContract, true, typeName), jsonContract);
+                    : FilterSchema(CreateArraySchema(arrayContract, true, typeName), jsonContract, parameterDescriptor);
 
             var objectContract = jsonContract as JsonObjectContract;
             if (objectContract != null && !objectContract.IsAmbiguous())
                 return CreateRefSchema(type);
 
             // Fallback to abstract "object"
-            return FilterSchema(new Schema { type = "object" }, jsonContract);
+            return FilterSchema(new Schema { type = "object" }, jsonContract, parameterDescriptor);
         }
 
-        public Schema CreateDefinitionSchema(Type type)
+        public Schema CreateDefinitionSchema(Type type, HttpParameterDescriptor parameterDescriptor = null)
         {
             var jsonContract = _contractResolver.ResolveContract(type);
 
-            return CreateDefinitionSchema(jsonContract);
+            return CreateDefinitionSchema(jsonContract, parameterDescriptor);
         }
 
-        public Schema CreateDefinitionSchema(JsonContract jsonContract)
+        public Schema CreateDefinitionSchema(JsonContract jsonContract, HttpParameterDescriptor parameterDescriptor = null)
         {
             if (jsonContract is JsonDictionaryContract)
-                return FilterSchema(CreateDictionarySchema((JsonDictionaryContract)jsonContract), jsonContract);
+                return FilterSchema(CreateDictionarySchema((JsonDictionaryContract)jsonContract), jsonContract, parameterDescriptor);
 
             if (jsonContract is JsonArrayContract)
-                return FilterSchema(CreateArraySchema((JsonArrayContract)jsonContract, false), jsonContract);
+                return FilterSchema(CreateArraySchema((JsonArrayContract)jsonContract, false), jsonContract, parameterDescriptor);
 
             if (jsonContract is JsonObjectContract)
-                return FilterSchema(CreateObjectSchema((JsonObjectContract)jsonContract, true), jsonContract);
+                return FilterSchema(CreateObjectSchema((JsonObjectContract)jsonContract, true), jsonContract, parameterDescriptor);
 
             throw new InvalidOperationException("Unsupported type for Defintitions. Must be Dictionary, Array or Object");
         }
@@ -267,7 +268,7 @@ namespace Swagger.Net
             return new Schema { @ref = "#/definitions/" + _workItems[type].SchemaId };
         }
 
-        private Schema FilterSchema(Schema schema, JsonContract jsonContract)
+        private Schema FilterSchema(Schema schema, JsonContract jsonContract, HttpParameterDescriptor parameterDescriptor)
         {
             if (schema.type == "object" || _options.ApplyFiltersToAllSchemas)
             {
@@ -284,7 +285,7 @@ namespace Swagger.Net
 
                 foreach (var filter in _options.SchemaFilters)
                 {
-                    filter.Apply(schema, this, jsonContract.UnderlyingType);
+                    filter.Apply(schema, this, jsonContract.UnderlyingType, parameterDescriptor);
                 }
             }
 
