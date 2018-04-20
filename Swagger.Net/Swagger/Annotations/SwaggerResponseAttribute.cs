@@ -11,7 +11,7 @@ namespace Swagger.Net.Annotations
             StatusCode = (int)statusCode;
         }
 
-        public SwaggerResponseAttribute(HttpStatusCode statusCode, string description = null, Type type = null, string typeName = null, string mediaType = null, object examples = null)
+        public SwaggerResponseAttribute(HttpStatusCode statusCode, string description = null, Type type = null, string typeName = null, string mediaType = null, object examples = null, Type exampleClassType = null, string exampleMethodeName = null)
             : this(statusCode)
         {
             Description = description;
@@ -19,6 +19,8 @@ namespace Swagger.Net.Annotations
             TypeName = typeName;
             MediaType = mediaType;
             Examples = examples;
+            ExampleClassType = exampleClassType;
+            ExampleMethodeName = exampleMethodeName;
         }
 
         public SwaggerResponseAttribute(int statusCode)
@@ -26,7 +28,7 @@ namespace Swagger.Net.Annotations
             StatusCode = statusCode;
         }
 
-        public SwaggerResponseAttribute(int statusCode, string description = null, Type type = null, string typeName = null, string mediaType = null, object examples = null)
+        public SwaggerResponseAttribute(int statusCode, string description = null, Type type = null, string typeName = null, string mediaType = null, object examples = null, Type exampleClassType = null, string exampleMethodeName = null)
             : this(statusCode)
         {
             Description = description;
@@ -34,6 +36,8 @@ namespace Swagger.Net.Annotations
             TypeName = typeName;
             MediaType = mediaType;
             Examples = examples;
+            ExampleClassType = exampleClassType;
+            ExampleMethodeName = exampleMethodeName;
         }
 
         public int StatusCode { get; private set; }
@@ -47,5 +51,15 @@ namespace Swagger.Net.Annotations
         public string MediaType { get; set; }
 
         public object Examples { get; set; }
+
+        /// <summary> 
+        /// Classe contenant l'exemple 
+        /// </summary> 
+        public Type ExampleClassType { get; set; }
+
+        /// <summary> 
+        /// Methode de la classe renvoyant l'exemple 
+        /// </summary> 
+        public string ExampleMethodeName { get; set; }
     }
 }

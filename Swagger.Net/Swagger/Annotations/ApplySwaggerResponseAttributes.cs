@@ -3,6 +3,8 @@ using System.Linq;
 using System.Net;
 using System.Collections.Generic;
 using System.Web.Http.Description;
+using System.Reflection;
+using Newtonsoft.Json;
 
 namespace Swagger.Net.Annotations
 {
@@ -29,6 +31,16 @@ namespace Swagger.Net.Annotations
                 {
                     operation.responses[statusCode].examples = new Dictionary<string, object> { { attr.MediaType, attr.Examples } };
                 }
+                if (attr.ExampleClassType != null && !String.IsNullOrEmpty(attr.ExampleMethodeName))
+                {
+                    object exampleClass = Activator.CreateInstance(attr.ExampleClassType);
+
+                    MethodInfo exampleMethodInfo = attr.ExampleClassType.GetMethod(attr.ExampleMethodeName);
+
+                    JsonSerializerSettings controllerSerializerSettings = apiDescription.ActionDescriptor.ControllerDescriptor.Configuration.Formatters.JsonFormatter.SerializerSettings;
+
+                    operation.responses[statusCode].examples = FormatJson(exampleMethodInfo.Invoke(exampleClass, null), controllerSerializerSettings);
+                }
             }
 
             var mediaTypes = responseAttributes
@@ -48,6 +60,21 @@ namespace Swagger.Net.Annotations
                 return enumValue.ToString();
             }
             return null;
+        }
+
+        private static object FormatJson(object example, JsonSerializerSettings serializerSettings)
+        {
+            string jsonString = JsonConvert.SerializeObject(example, serializerSettings);
+            
+            // on encapsule les booleen, int... 
+            if (example.GetType().IsValueType && !jsonString.StartsWith("\""))
+            {
+                jsonString = "\"" + jsonString + "\"";
+            }
+
+            jsonString = "{ \"application/json\": " + jsonString + " }";
+
+            return JsonConvert.DeserializeObject(jsonString);
         }
     }
 }
