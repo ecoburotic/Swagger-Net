@@ -15,6 +15,12 @@ namespace Swagger.Net.Annotations
             operation.parameters = operation.parameters ?? new List<Parameter>();
 
             var swaggerHeaderParamAttributes = apiDescription.ActionDescriptor.GetCustomAttributes<SwaggerHeaderParamAttribute>().ToList();
+            var swaggerPaginationHeaderParametersAttributes = apiDescription.ActionDescriptor.GetCustomAttributes<SwaggerPaginationHeaderParametersAttribute>();
+
+            foreach (SwaggerPaginationHeaderParametersAttribute swaggerPaginationHeaderParametersAttribute in swaggerPaginationHeaderParametersAttributes)
+            {
+                swaggerHeaderParamAttributes.AddRange(swaggerPaginationHeaderParametersAttribute.RequestHeaderParameters);
+            }
 
             foreach (SwaggerHeaderParamAttribute swaggerHeaderParamAttribute in swaggerHeaderParamAttributes)
             {

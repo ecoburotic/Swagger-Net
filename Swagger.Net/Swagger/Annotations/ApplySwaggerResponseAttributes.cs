@@ -51,6 +51,21 @@ namespace Swagger.Net.Annotations
 
                     operation.responses[keyStatusCode].examples = FormatJson(exampleMethodInfo.Invoke(exampleClass, null), controllerSerializerSettings);
                 }
+
+                if ((attr.StatusCode / 100) == 2)
+                {
+                    var swaggerPaginationHeaderParametersAttributes = apiDescription.ActionDescriptor.GetCustomAttributes<SwaggerPaginationHeaderParametersAttribute>();
+
+                    operation.responses[keyStatusCode].headers = new Dictionary<string, Header>();
+
+                    foreach (SwaggerPaginationHeaderParametersAttribute swaggerPaginationHeaderParametersAttribute in swaggerPaginationHeaderParametersAttributes)
+                    {
+                        foreach (KeyValuePair<string, Header> responseHeader in swaggerPaginationHeaderParametersAttribute.ResponseHeaders)
+                        {
+                            operation.responses[keyStatusCode].headers.Add(responseHeader);
+                        }
+                    }
+                }
             }
 
             var mediaTypes = responseAttributes
