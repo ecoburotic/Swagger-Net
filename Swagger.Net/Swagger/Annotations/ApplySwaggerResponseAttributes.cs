@@ -12,24 +12,34 @@ namespace Swagger.Net.Annotations
     {
         public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
         {
-            if (apiDescription.GetControllerAndActionAttributes<SwaggerResponseRemoveDefaultsAttribute>().Any())
-                operation.responses.Clear();
+            operation.responses.Clear();
 
             var responseAttributes = apiDescription
                 .GetControllerAndActionAttributes<SwaggerResponseAttribute>()
                 .OrderBy(attr => attr.StatusCode);
+
+            List<string> statusCodes = responseAttributes.Select(r => r.StatusCode.ToString()).Distinct().ToList();
+
             foreach (var attr in responseAttributes)
             {
-                var statusCode = attr.StatusCode.ToString();
+                string statusCode = attr.StatusCode.ToString();
 
-                operation.responses[statusCode] = new Response
+                statusCode += new string(' ', statusCodes.IndexOf(statusCode));
+
+                string keyStatusCode = statusCode;
+                while (operation.responses.ContainsKey(keyStatusCode))
                 {
-                    description = attr.Description ?? InferDescriptionFrom(statusCode),
+                    keyStatusCode = keyStatusCode + " ";
+                }
+
+                operation.responses[keyStatusCode] = new Response
+                {
+                    description = attr.Description ?? InferDescriptionFrom(keyStatusCode),
                     schema = (attr.Type != null) ? schemaRegistry.GetOrRegister(attr.Type, attr.TypeName) : null
                 };
                 if (attr.MediaType != null && attr.Examples != null)
                 {
-                    operation.responses[statusCode].examples = new Dictionary<string, object> { { attr.MediaType, attr.Examples } };
+                    operation.responses[keyStatusCode].examples = new Dictionary<string, object> { { attr.MediaType, attr.Examples } };
                 }
                 if (attr.ExampleClassType != null && !String.IsNullOrEmpty(attr.ExampleMethodeName))
                 {
@@ -39,7 +49,7 @@ namespace Swagger.Net.Annotations
 
                     JsonSerializerSettings controllerSerializerSettings = apiDescription.ActionDescriptor.ControllerDescriptor.Configuration.Formatters.JsonFormatter.SerializerSettings;
 
-                    operation.responses[statusCode].examples = FormatJson(exampleMethodInfo.Invoke(exampleClass, null), controllerSerializerSettings);
+                    operation.responses[keyStatusCode].examples = FormatJson(exampleMethodInfo.Invoke(exampleClass, null), controllerSerializerSettings);
                 }
             }
 
