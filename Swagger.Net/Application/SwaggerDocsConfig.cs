@@ -74,6 +74,7 @@ namespace Swagger.Net.Application
             OperationFilter<ApplySwaggerResponseAttributes>();
             OperationFilter<ApplySwaggerOperationFilterAttributes>();
             OperationFilter<ApplySwaggerExampleAttribute>();
+            OperationFilter<ApplySwaggerHeaderParamAttribute>();
         }
 
         public InfoBuilder SingleApiVersion(string version, string title)

@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application\HttpRouteDirectionConstraint.cs" />
+    <Compile Include="Swagger\Annotations\ApplySwaggerHeaderParamAttribute.cs" />
     <Compile Include="Swagger\Annotations\ApplySwaggerOperationAttributes.cs" />
     <Compile Include="Swagger\Annotations\ApplySwaggerSchemaFilterAttributes.cs" />
     <Compile Include="Swagger\Annotations\ApplySwaggerOperationFilterAttributes.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="Swagger\Annotations\SwaggerExampleAttribute.cs" />
     <Compile Include="Swagger\Annotations\ApplySwaggerExampleAttribute.cs" />
     <Compile Include="Swagger\Annotations\SwaggerGlobalHeaderParameter.cs" />
+    <Compile Include="Swagger\Annotations\SwaggerHeaderParamAttribute.cs" />
     <Compile Include="Swagger\Annotations\SwaggerOperationAttribute.cs" />
     <Compile Include="Swagger\Annotations\SwaggerSchemaFilterAttribute.cs" />
     <Compile Include="Swagger\Annotations\SwaggerOperationFilterAttribute.cs" />
